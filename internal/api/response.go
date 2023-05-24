@@ -24,7 +24,7 @@ func JSONMethodNotAllowed(allowed string) (*events.APIGatewayProxyResponse, erro
 	return &events.APIGatewayProxyResponse{
 		Headers:    map[string]string{"Content-Type": "application/json"},
 		StatusCode: http.StatusMethodNotAllowed,
-		Body:       `{"message": "Method Not Allowed", "allowed_method": ` + allowed + `}}`,
+		Body:       `{"message": "Method Not Allowed", "allowed_method": ` + allowed + `}`,
 	}, nil
 }
 
