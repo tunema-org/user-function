@@ -18,14 +18,14 @@ func NewHandler(ctx context.Context, backend *backend.Backend) func(events.APIGa
 	}
 
 	return func(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-		switch req.Path {
-		case "/register":
+		switch req.Resource {
+		case "/users/register":
 			if req.HTTPMethod != http.MethodPost {
 				return JSONMethodNotAllowed(http.MethodPost)
 			}
 
 			return h.Register(ctx, req)
-		case "/login":
+		case "/users/login":
 			if req.HTTPMethod != http.MethodPost {
 				return JSONMethodNotAllowed(http.MethodPost)
 			}
