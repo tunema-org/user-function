@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/rs/zerolog/log"
 	"github.com/tunema-org/user-function/internal/backend"
 	"github.com/tunema-org/user-function/internal/repository"
 )
@@ -39,6 +40,7 @@ func (h *handler) Register(ctx context.Context, req events.APIGatewayProxyReques
 			"message": "user already exists",
 		})
 	case err != nil:
+		log.Error().Err(err).Msg("problem with user register")
 		return JSON(http.StatusInternalServerError, M{
 			"message": "internal server error",
 		})

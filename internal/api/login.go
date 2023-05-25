@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/rs/zerolog/log"
 	"github.com/tunema-org/user-function/internal/backend"
 )
 
@@ -34,6 +35,7 @@ func (h *handler) Login(ctx context.Context, req events.APIGatewayProxyRequest) 
 			"message": backend.ErrLoginInvalidCredentials.Error(),
 		})
 	case err != nil:
+		log.Error().Err(err).Msg("problem with user login")
 		return JSON(http.StatusInternalServerError, M{
 			"message": "internal server error",
 		})

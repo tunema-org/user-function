@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
-	"log"
+	"os"
 
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/pkgerrors"
 	"github.com/tunema-org/user-function/internal/api"
 	"github.com/tunema-org/user-function/internal/backend"
 	"github.com/tunema-org/user-function/internal/clients"
@@ -20,6 +23,15 @@ func main() {
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
+
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	if os.Getenv("DEBUG") == "true" {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -27,7 +39,7 @@ func main() {
 
 	clients, err := clients.New(ctx, cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err)
 	}
 
 	repo := repository.New(clients.DB)
