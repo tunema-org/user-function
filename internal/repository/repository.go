@@ -41,7 +41,7 @@ func (r *Repository) InsertUser(ctx context.Context, user User) (int, error) {
 func (r *Repository) FindUserByID(ctx context.Context, id int) (User, error) {
 	query := `SELECT id, username, email, password, profile_img_url FROM users WHERE id = $1`
 	var user User
-	err := r.db.QueryRow(ctx, query, id).Scan(&user.ID, &user.Username, &user.Email, &user.ProfileImgURL)
+	err := r.db.QueryRow(ctx, query, id).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.ProfileImgURL)
 	if err != nil {
 		return User{}, err
 	}
@@ -52,7 +52,7 @@ func (r *Repository) FindUserByID(ctx context.Context, id int) (User, error) {
 func (r *Repository) FindUserByEmail(ctx context.Context, email string) (User, error) {
 	query := `SELECT id, username, email, password, profile_img_url FROM users WHERE email = $1`
 	var user User
-	err := r.db.QueryRow(ctx, query, email).Scan(&user.ID, &user.Username, &user.Email, &user.ProfileImgURL)
+	err := r.db.QueryRow(ctx, query, email).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.ProfileImgURL)
 	if err != nil {
 		return User{}, err
 	}
