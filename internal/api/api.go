@@ -31,6 +31,12 @@ func NewHandler(ctx context.Context, backend *backend.Backend) func(events.APIGa
 			}
 
 			return h.Login(ctx, req)
+		case "/users/me":
+			if req.HTTPMethod != http.MethodGet {
+				return JSONMethodNotAllowed(http.MethodGet)
+			}
+
+			return h.Me(ctx, req)
 		default:
 			return JSONNotFound()
 		}
