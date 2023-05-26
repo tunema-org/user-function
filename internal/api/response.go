@@ -5,9 +5,10 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/gin-gonic/gin"
 )
 
-type M map[string]string
+type M gin.H
 
 func JSON(status int, body any) (*events.APIGatewayProxyResponse, error) {
 	resp := events.APIGatewayProxyResponse{

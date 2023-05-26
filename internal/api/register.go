@@ -1,12 +1,10 @@
 package api
 
 import (
-	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 
-	"github.com/aws/aws-lambda-go/events"
+	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/tunema-org/user-function/internal/backend"
 	"github.com/tunema-org/user-function/internal/repository"
@@ -19,16 +17,17 @@ type RegisterInput struct {
 	ProfileImgURL string `json:"profile_img_url"`
 }
 
-func (h *handler) Register(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+func (h *handler) Register(c *gin.Context) {
 	var input RegisterInput
 
-	if err := json.Unmarshal([]byte(req.Body), &input); err != nil {
-		return JSON(http.StatusBadRequest, M{
+	if err := c.Bind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, M{
 			"message": "invalid request body",
 		})
+		return
 	}
 
-	result, err := h.backend.Register(ctx, backend.RegisterParams{
+	result, err := h.backend.Register(c.Request.Context(), backend.RegisterParams{
 		Username:      input.Username,
 		Email:         input.Email,
 		Password:      input.Password,
@@ -36,17 +35,19 @@ func (h *handler) Register(ctx context.Context, req events.APIGatewayProxyReques
 	})
 	switch {
 	case errors.Is(err, repository.ErrUserAlreadyExists):
-		return JSON(http.StatusConflict, M{
+		c.JSON(http.StatusConflict, M{
 			"message": "user already exists",
 		})
+		return
 	case err != nil:
 		log.Error().Err(err).Msg("problem with user register")
-		return JSON(http.StatusInternalServerError, M{
+		c.JSON(http.StatusInternalServerError, M{
 			"message": "internal server error",
 		})
+		return
 	}
 
-	return JSON(http.StatusCreated, M{
+	c.JSON(http.StatusCreated, M{
 		"message":      "user created",
 		"access_token": result.AccessToken,
 	})

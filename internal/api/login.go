@@ -1,12 +1,10 @@
 package api
 
 import (
-	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 
-	"github.com/aws/aws-lambda-go/events"
+	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/tunema-org/user-function/internal/backend"
 )
@@ -16,33 +14,33 @@ type LoginInput struct {
 	Password string `json:"password"`
 }
 
-func (h *handler) Login(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+func (h *handler) Login(c *gin.Context) {
 	var input LoginInput
 
-	if err := json.Unmarshal([]byte(req.Body), &input); err != nil {
-		return JSON(http.StatusBadRequest, M{
+	if err := c.Bind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, M{
 			"message": "invalid request body",
 		})
 	}
 
-	result, err := h.backend.Login(ctx, backend.LoginParams{
+	result, err := h.backend.Login(c.Request.Context(), backend.LoginParams{
 		Email:    input.Email,
 		Password: input.Password,
 	})
 	switch {
 	case errors.Is(err, backend.ErrLoginInvalidCredentials):
-		return JSON(http.StatusUnauthorized, M{
+		c.JSON(http.StatusUnauthorized, M{
 			"message": backend.ErrLoginInvalidCredentials.Error(),
 		})
 	case err != nil:
 		log.Error().Err(err).Msg("problem with user login")
-		return JSON(http.StatusInternalServerError, M{
+		c.JSON(http.StatusInternalServerError, M{
 			"message": "internal server error",
 		})
+	default:
+		c.JSON(http.StatusCreated, M{
+			"message":      "user logged in",
+			"access_token": result.AccessToken,
+		})
 	}
-
-	return JSON(http.StatusCreated, M{
-		"message":      "user logged in",
-		"access_token": result.AccessToken,
-	})
 }

@@ -4,7 +4,11 @@ import (
 	"context"
 	"os"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
+	"github.com/gin-gonic/gin"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
@@ -16,14 +20,6 @@ import (
 )
 
 func main() {
-	// region := os.Getenv("AWS_REGION")
-	// awsSession, err := session.NewSession(&aws.Config{
-	// 	Region: aws.String(region),
-	// })
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
@@ -39,12 +35,36 @@ func main() {
 
 	clients, err := clients.New(ctx, cfg)
 	if err != nil {
-		log.Fatal().Err(err)
+		log.Fatal().Err(err).Send()
 	}
 
+	log.Info().Msgf("%+v\n", cfg)
+	log.Info().Msgf("%+v\n", clients)
+
+	log.Info().Msg("yooooooo")
 	repo := repository.New(clients.DB)
 	backend := backend.New(clients, repo, cfg)
 	handler := api.NewHandler(ctx, backend)
 
-	lambda.Start(handler)
+	if !isLambda() {
+		handler.Run()
+		return
+	}
+
+	log.Info().Msg("Running in AWS Lambda")
+	lambdaHandler := createLambdaHandler(ctx, handler)
+	lambda.Start(lambdaHandler)
+}
+
+type LambdaHandler func(context.Context, events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error)
+
+func createLambdaHandler(ctx context.Context, api *gin.Engine) LambdaHandler {
+	ginLambda := ginadapter.New(api)
+	return func(ctx_ context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+		return ginLambda.ProxyWithContext(ctx_, req)
+	}
+}
+
+func isLambda() bool {
+	return os.Getenv("AWS_LAMBDA_FUNCTION_NAME") != ""
 }
