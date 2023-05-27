@@ -22,6 +22,7 @@ func NewHandler(ctx context.Context, backend *backend.Backend) *gin.Engine {
 	r.POST("/users/register", h.Register)
 	r.POST("/users/login", h.Login)
 	r.GET("/users/me", h.Me)
+	r.PATCH("/users", h.UpdateProfile)
 	r.GET("/users/health", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "healthy",

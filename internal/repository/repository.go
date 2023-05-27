@@ -38,6 +38,16 @@ func (r *Repository) InsertUser(ctx context.Context, user User) (int, error) {
 	return userID, nil
 }
 
+func (r *Repository) UpdateUser(ctx context.Context, id int, user User) error {
+	query := `UPDATE users SET username = $1, profile_img_url = $2 WHERE id = $3`
+	_, err := r.db.Exec(ctx, query, user.Username, user.ProfileImgURL, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *Repository) FindUserByID(ctx context.Context, id int) (User, error) {
 	query := `SELECT id, username, email, password, profile_img_url FROM users WHERE id = $1`
 	var user User

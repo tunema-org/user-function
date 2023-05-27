@@ -2,12 +2,13 @@ package clients
 
 import (
 	"context"
-	"mime/multipart"
+	"io"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/tunema-org/user-function/internal/config"
 )
 
@@ -28,27 +29,29 @@ func NewAWSSession(cfg *config.Config) (*session.Session, error) {
 }
 
 type S3 struct {
-	sess   *session.Session
-	client *s3.S3
-	bucket string
+	sess     *session.Session
+	client   *s3.S3
+	uploader *s3manager.Uploader
+	bucket   string
 }
 
 func S3NewClient(sess *session.Session, bucket string) *S3 {
 	return &S3{
-		sess:   sess,
-		bucket: bucket,
-		client: s3.New(sess),
+		sess:     sess,
+		bucket:   bucket,
+		client:   s3.New(sess),
+		uploader: s3manager.NewUploader(sess),
 	}
 }
 
-func (s *S3) UploadFile(ctx context.Context, key string, file multipart.File) (*s3.PutObjectOutput, error) {
-	input := &s3.PutObjectInput{
+func (s *S3) UploadFile(ctx context.Context, key string, file io.Reader) (*s3manager.UploadOutput, error) {
+	input := &s3manager.UploadInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(key),
 		Body:   file,
 	}
 
-	return s.client.PutObjectWithContext(ctx, input)
+	return s.uploader.UploadWithContext(ctx, input)
 }
 
 func (s *S3) FindFile(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {

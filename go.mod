@@ -8,10 +8,12 @@ require (
 	github.com/awslabs/aws-lambda-go-api-proxy v0.14.0
 	github.com/gin-gonic/gin v1.9.0
 	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/joho/godotenv v1.5.1
 	github.com/rs/zerolog v1.29.1
 	golang.org/x/crypto v0.7.0
+	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/sync v0.1.0
 )
 
