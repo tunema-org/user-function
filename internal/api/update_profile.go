@@ -49,7 +49,11 @@ func (h *handler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	acceptedImageFileTypes := []string{"image/jpeg", "image/png"}
+	acceptedImageFileTypes := []string{
+		"image/jpeg",
+		"image/png",
+		"image/jpg",
+	}
 
 	if !mime.Contains(profileImg, acceptedImageFileTypes) {
 		c.JSON(http.StatusBadRequest, M{
