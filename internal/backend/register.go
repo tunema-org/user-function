@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/tunema-org/user-function/internal/jwt"
-	"github.com/tunema-org/user-function/internal/repository"
+	"github.com/tunema-org/user-function/model"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,7 +27,7 @@ func (b *Backend) Register(ctx context.Context, params RegisterParams) (Register
 		return RegisterResult{}, err
 	}
 
-	userID, err := b.repo.InsertUser(ctx, repository.User{
+	userID, err := b.repo.InsertUser(ctx, model.User{
 		Username:      params.Username,
 		Email:         params.Email,
 		Password:      string(hash),

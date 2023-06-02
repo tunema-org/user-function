@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/tunema-org/user-function/internal/jwt"
-	"github.com/tunema-org/user-function/internal/repository"
+	"github.com/tunema-org/user-function/model"
 )
 
 type UpdateProfileParams struct {
@@ -35,7 +35,7 @@ func (b *Backend) UpdateProfile(ctx context.Context, accessToken string, params 
 		return err
 	}
 
-	err = b.repo.UpdateUser(ctx, int(userID), repository.User{
+	err = b.repo.UpdateUser(ctx, int(userID), model.User{
 		Username:      params.Username,
 		ProfileImgURL: output.Location,
 	})
