@@ -38,16 +38,12 @@ func main() {
 		log.Fatal().Err(err).Send()
 	}
 
-	log.Info().Msgf("%+v\n", cfg)
-	log.Info().Msgf("%+v\n", clients)
-
-	log.Info().Msg("yooooooo")
 	repo := repository.New(clients.DB)
 	backend := backend.New(clients, repo, cfg)
 	handler := api.NewHandler(ctx, backend)
 
 	if !isLambda() {
-		handler.Run()
+		handler.Run(cfg.Address)
 		return
 	}
 

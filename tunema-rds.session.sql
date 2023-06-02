@@ -14,16 +14,16 @@ CREATE TABLE IF NOT EXISTS wishlists(
 
 CREATE TABLE IF NOT EXISTS samples(
     id int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id int,
-    name varchar(250),
-    bpm int,
-    instrument varchar(250),
-    key varchar(250),
-    length varchar(250),
-    sample_file_url text,
-    cover_url text,
-    price text,
-    type text,
+    user_id int NOT NULL,
+    name varchar(250) NOT NULL,
+    bpm int NOT NULL,
+    key varchar(250) NOT NULL,
+    key_scale varchar(250) NOT NULL,
+    time int NOT NULL,
+    file_url text NOT NULL,
+    cover_url text NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    created_at timestamp(0) without time zone NOT NULL,
     CONSTRAINT fk_samples_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
