@@ -3,7 +3,9 @@ package api
 import (
 	"context"
 	"net/http"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/tunema-org/user-function/internal/backend"
 )
@@ -18,6 +20,14 @@ func NewHandler(ctx context.Context, backend *backend.Backend) *gin.Engine {
 	}
 
 	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: false,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	r.POST("/users/register", h.Register)
 	r.POST("/users/login", h.Login)
