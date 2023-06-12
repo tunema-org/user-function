@@ -15,16 +15,16 @@ func New(db *pgxpool.Pool) *Repository {
 	return &Repository{db: db}
 }
 
-func (r *Repository) InsertUser(ctx context.Context, user model.User) (int, error) {
+func (r *Repository) InsertUser(ctx context.Context, user model.User) (model.User, error) {
 	existsQuery := `SELECT EXISTS (SELECT 1 FROM users WHERE email = $1)`
 	var alreadyExists bool
 	err := r.db.QueryRow(ctx, existsQuery, user.Email).Scan(&alreadyExists)
 	if err != nil {
-		return -1, err
+		return model.User{}, err
 	}
 
 	if alreadyExists {
-		return -1, ErrUserAlreadyExists
+		return model.User{}, ErrUserAlreadyExists
 	}
 
 	insertQuery := `INSERT INTO users (username, email, password, profile_img_url) VALUES ($1, $2, $3, $4) RETURNING id`
@@ -33,10 +33,12 @@ func (r *Repository) InsertUser(ctx context.Context, user model.User) (int, erro
 	err = r.db.QueryRow(ctx, insertQuery, user.Username, user.Email, user.Password, user.ProfileImgURL).
 		Scan(&userID)
 	if err != nil {
-		return -1, err
+		return model.User{}, err
 	}
 
-	return userID, nil
+	user.ID = userID
+
+	return user, nil
 }
 
 func (r *Repository) UpdateUser(ctx context.Context, id int, user model.User) error {

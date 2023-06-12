@@ -49,6 +49,7 @@ func (h *handler) Register(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, M{
 		"message":      "user created",
+		"user":         result.User,
 		"access_token": result.AccessToken,
 	})
 }

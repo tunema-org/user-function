@@ -17,7 +17,7 @@ type RegisterParams struct {
 }
 
 type RegisterResult struct {
-	UserID      int
+	User        model.User
 	AccessToken string
 }
 
@@ -27,7 +27,7 @@ func (b *Backend) Register(ctx context.Context, params RegisterParams) (Register
 		return RegisterResult{}, err
 	}
 
-	userID, err := b.repo.InsertUser(ctx, model.User{
+	user, err := b.repo.InsertUser(ctx, model.User{
 		Username:      params.Username,
 		Email:         params.Email,
 		Password:      string(hash),
@@ -38,7 +38,7 @@ func (b *Backend) Register(ctx context.Context, params RegisterParams) (Register
 	}
 
 	accessToken, err := jwt.Generate(map[string]any{
-		"userID": userID,
+		"userID": user.ID,
 		"exp":    time.Now().Add(b.cfg.JWTDuration).Unix(),
 		"email":  params.Email,
 	}, b.cfg.JWTSecretKey)
@@ -47,7 +47,7 @@ func (b *Backend) Register(ctx context.Context, params RegisterParams) (Register
 	}
 
 	return RegisterResult{
-		UserID:      userID,
+		User:        user,
 		AccessToken: accessToken,
 	}, nil
 }

@@ -18,6 +18,14 @@ type UpdateProfileInput struct {
 func (h *handler) UpdateProfile(c *gin.Context) {
 	var input UpdateProfileInput
 
+	authorization := strings.Split(c.Request.Header["Authorization"][0], " ")
+	if len(authorization) != 2 {
+		c.JSON(http.StatusUnauthorized, M{
+			"message": "please login",
+		})
+		return
+	}
+
 	if err := c.Bind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, M{
 			"message": "invalid request body",
@@ -61,15 +69,6 @@ func (h *handler) UpdateProfile(c *gin.Context) {
 		})
 		return
 	}
-
-	authorization := strings.Split(c.Request.Header["Authorization"][0], " ")
-	if len(authorization) != 2 {
-		c.JSON(http.StatusUnauthorized, M{
-			"message": "please login",
-		})
-		return
-	}
-
 	err = h.backend.UpdateProfile(c.Request.Context(), authorization[1], backend.UpdateProfileParams{
 		Username:       input.Username,
 		ProfileImg:     profileImg,
