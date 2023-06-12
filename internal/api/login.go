@@ -41,6 +41,7 @@ func (h *handler) Login(c *gin.Context) {
 		c.JSON(http.StatusCreated, M{
 			"message":      "user logged in",
 			"access_token": result.AccessToken,
+			"data":         result.User,
 		})
 	}
 }

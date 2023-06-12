@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/tunema-org/user-function/internal/jwt"
+	"github.com/tunema-org/user-function/model"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -15,7 +16,7 @@ type LoginParams struct {
 }
 
 type LoginResult struct {
-	UserID      int
+	User        model.User
 	AccessToken string
 }
 
@@ -44,7 +45,7 @@ func (b *Backend) Login(ctx context.Context, params LoginParams) (LoginResult, e
 	}
 
 	return LoginResult{
-		UserID:      user.ID,
+		User:        user,
 		AccessToken: accessToken,
 	}, nil
 }

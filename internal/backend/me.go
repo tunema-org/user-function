@@ -8,7 +8,7 @@ import (
 )
 
 type MeResult struct {
-	UserID        int    `json:"user_id"`
+	ID            int    `json:"id"`
 	Username      string `json:"username"`
 	Email         string `json:"email"`
 	ProfileImgURL string `json:"profile_img_url"`
@@ -31,7 +31,7 @@ func (b *Backend) Me(ctx context.Context, accessToken string) (MeResult, error) 
 	}
 
 	return MeResult{
-		UserID:        user.ID,
+		ID:            user.ID,
 		Username:      user.Username,
 		Email:         user.Email,
 		ProfileImgURL: user.ProfileImgURL,
